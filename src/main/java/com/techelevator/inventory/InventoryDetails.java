@@ -30,6 +30,15 @@ public class InventoryDetails {
         return inventoryQty;
     }
 
+
+
+
+
+
+
+
+
+
     public String getInventoryCategory() {
         return inventoryCategory;
     }
