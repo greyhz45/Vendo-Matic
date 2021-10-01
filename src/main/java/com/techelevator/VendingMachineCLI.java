@@ -10,6 +10,8 @@ import com.techelevator.view.Menu;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class VendingMachineCLI {
@@ -45,6 +47,10 @@ public class VendingMachineCLI {
 		FeedMoney feedMoney = new FeedMoney();
 		Scanner userInput = new Scanner(System.in);
 
+		//for log date formatting
+        LocalDate today = LocalDate.now();
+        String formattedDate = today.format(DateTimeFormatter.ofPattern("MMddyyyy"));
+
 		//for currency formatting
 		NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
 		String oldBalStr;
@@ -72,10 +78,10 @@ public class VendingMachineCLI {
 									oldBalStr = currencyFormat.format(RunningBalance.getOldBalance());
 									currBalStr = currencyFormat.format(RunningBalance.getCurrBalance());
 									if (!resetTran) {
-										VendoLog.log("FEED MONEY", currBalStr, currBalStr);
+										VendoLog.log("FEED MONEY", currBalStr, currBalStr, formattedDate);
 										resetTran = false;
 									} else {
-										VendoLog.log("FEED MONEY", oldBalStr, currBalStr);
+										VendoLog.log("FEED MONEY", oldBalStr, currBalStr, formattedDate);
 									}
 								}
 								break;
@@ -94,7 +100,7 @@ public class VendingMachineCLI {
 						RunningBalance.giveChange();
 						oldBalStr = currencyFormat.format(RunningBalance.getOldBalance());
 						currBalStr = currencyFormat.format(RunningBalance.getCurrBalance());
-						VendoLog.log("GIVE CHANGE", oldBalStr, currBalStr);
+						VendoLog.log("GIVE CHANGE", oldBalStr, currBalStr, formattedDate);
 						resetTran = true;
 						break;
 					}

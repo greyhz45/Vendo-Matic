@@ -4,6 +4,8 @@ import com.techelevator.Product;
 import com.techelevator.util.VendoLog;
 
 import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,6 +55,10 @@ public class PurchaseItem {
         //format currency
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
 
+        //for log date formatting
+        LocalDate today = LocalDate.now();
+        String formattedDate = today.format(DateTimeFormatter.ofPattern("MMddyyyy"));
+
         String oldBalStr;
         String currBalStr;
         String keycode = this.codeBought.toUpperCase();
@@ -70,7 +76,7 @@ public class PurchaseItem {
                 System.out.println("*** " + items.get(keycode).getSound());
             }
             String forLog = items.get(keycode).getName() + " " + items.get(keycode).getSlot();
-            VendoLog.log(forLog, oldBalStr, currBalStr);
+            VendoLog.log(forLog, oldBalStr, currBalStr, formattedDate);
             return true;
         } else {
             return false;

@@ -10,10 +10,11 @@ public class VendoLog {
 
     static PrintWriter logOutput = null;
 
-    public static void log(String tranName, String oldBalance, String newBalance) {
+    public static void log(String tranName, String oldBalance, String newBalance, String date) {
 
-        String logPath = "logs/vendolog.log";
+        String logPath = "logs/vendolog" + "_" + date + ".log";
         File logFile = new File(logPath);
+        //formatter for audit log
         LocalDateTime time = LocalDateTime.now();
         String timestamp = DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a").format(time);
 
@@ -28,7 +29,7 @@ public class VendoLog {
 
         try {
             if (logOutput == null) {
-                logOutput = new PrintWriter(new FileOutputStream(logFile));
+                logOutput = new PrintWriter(new FileOutputStream(logFile, true));
             }
             if (tranName.equals("FEED MONEY") || tranName.equals("GIVE CHANGE")) {
                 logOutput.println(timestamp + " " + tranName + ": " + oldBalance + " " + newBalance);
@@ -38,7 +39,11 @@ public class VendoLog {
         } catch (FileNotFoundException e) {
             throw new VendoLogException(e.getMessage());
         } finally {
-            logOutput.flush();
+            if (tranName.equals("GIVE CHANGE")) {
+                logOutput.close();
+            } else {
+                logOutput.flush();
+            }
         }
     }
 }
