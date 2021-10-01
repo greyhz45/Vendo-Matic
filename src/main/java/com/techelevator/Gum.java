@@ -2,7 +2,7 @@ package com.techelevator;
 
 import java.math.BigDecimal;
 
-public class Gum extends Product{
+public class Gum extends Product {
 
     public Gum(String slot, String name, BigDecimal price, int quantity) {
 

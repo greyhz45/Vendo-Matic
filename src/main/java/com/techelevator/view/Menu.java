@@ -1,5 +1,7 @@
 package com.techelevator.view;
 
+import com.techelevator.menu_process.RunningBalance;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -9,10 +11,12 @@ public class Menu {
 
 	private PrintWriter out;
 	private Scanner in;
+	private String menuType;
 
-	public Menu(InputStream input, OutputStream output) {
+	public Menu(InputStream input, OutputStream output, String type) {
 		this.out = new PrintWriter(output);
 		this.in = new Scanner(input);
+		this.menuType = type;
 	}
 
 	public Object getChoiceFromOptions(Object[] options) {
@@ -47,6 +51,10 @@ public class Menu {
 			int optionNum = i + 1;
 			out.println(optionNum + ") " + options[i]);
 		}
+
+		if (this.menuType.equalsIgnoreCase("purchase"))
+			out.printf("\nCurrent Money Provided: $%5.2f \n", RunningBalance.getCurrBalance());
+
 		out.print(System.lineSeparator() + "Please choose an option >>> ");
 		out.flush();
 	}

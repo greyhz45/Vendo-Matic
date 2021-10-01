@@ -1,6 +1,6 @@
 package com.techelevator;
 import java.math.BigDecimal;
-public class Product implements Sellable, Soundable {
+public class Product {
     private String slot;
     private String name;
     private BigDecimal price;
@@ -21,7 +21,7 @@ public class Product implements Sellable, Soundable {
     public String getName() {
         return name;
     }
-    @Override
+
     public String getSound() {
         return sound;
     }
@@ -45,6 +45,7 @@ public class Product implements Sellable, Soundable {
     }
 
     public void setSound(String sound) {
+
         this.sound = sound;
     }
 

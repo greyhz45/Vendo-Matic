@@ -1,10 +1,11 @@
 package com.techelevator.inventory;
 
+import com.techelevator.*;
+
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.math.BigDecimal;
+import java.util.*;
 
 public class RestockMachine {
     private List<InputDetails> items;
@@ -20,15 +21,14 @@ public class RestockMachine {
     }
 
     private List<InputDetails> readInput() {
+
         List<InputDetails> items = new ArrayList<>();
         File dataFile = new File(this.file);
 
         try (Scanner dataInput = new Scanner(dataFile)) {
             while (dataInput.hasNextLine()) {
                 String[] inputArray = dataInput.nextLine().split("\\|");
-                InputDetails inputDetails = new InputDetails(inputArray[0], inputArray[1], Double.parseDouble(inputArray[2]), inputArray[3]);
-                /*inputDetails.setSlotIdentifier(inputArray[0]);
-                inputDetails.setName(inputArray[1]);*/
+                InputDetails inputDetails = new InputDetails(inputArray[0], inputArray[1], new BigDecimal(inputArray[2]), inputArray[3]);
                 items.add(inputDetails);
             }
         } catch (FileNotFoundException e) {
@@ -36,5 +36,39 @@ public class RestockMachine {
         }
 
         return items;
+    }
+
+    public Map<String, Product> buildStock() {
+
+        int MAX_QUANTITY = 5;
+        Map<String, Product> displayItems = new HashMap<>();
+        List<InputDetails> inputDetails = this.getItems();
+
+        for (InputDetails input: inputDetails) {
+
+            switch (input.getCategory().toUpperCase()) {
+                case "CHIP": {
+                    Product chip = new Chip(input.getSlotIdentifier(), input.getName(), input.getPrice(), MAX_QUANTITY);
+                    displayItems.put(input.getSlotIdentifier(), chip);
+                    break;
+                }
+                case "CANDY": {
+                    Product candy = new Candy(input.getSlotIdentifier(), input.getName(), input.getPrice(), MAX_QUANTITY);
+                    displayItems.put(input.getSlotIdentifier(), candy);
+                    break;
+                }
+                case "DRINK": {
+                    Product drink = new Drink(input.getSlotIdentifier(), input.getName(), input.getPrice(), MAX_QUANTITY);
+                    displayItems.put(input.getSlotIdentifier(), drink);
+                    break;
+                }
+                case "GUM": {
+                    Product gum = new Gum(input.getSlotIdentifier(), input.getName(), input.getPrice(), MAX_QUANTITY);
+                    displayItems.put(input.getSlotIdentifier(), gum);
+                }
+            }
+        }
+
+        return displayItems;
     }
 }
