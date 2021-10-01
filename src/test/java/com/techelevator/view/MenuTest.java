@@ -91,7 +91,7 @@ public class MenuTest {
 
 	private Menu getMenuForTestingWithUserInput(String userInput) {
 		ByteArrayInputStream input = new ByteArrayInputStream(String.valueOf(userInput).getBytes());
-		return new Menu(input, output);
+		return new Menu(input, output, " ");
 	}
 
 	private Menu getMenuForTesting() {

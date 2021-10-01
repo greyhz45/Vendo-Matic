@@ -20,7 +20,7 @@ public class VendoLog {
         if (!logFile.exists()) {
             System.out.println("Log File created!");
             try {
-                System.out.println("logfile create result: " + logFile.createNewFile());
+                logFile.createNewFile();
 
             } catch (IOException e) {
                 throw new VendoLogException(e.getMessage()); }
