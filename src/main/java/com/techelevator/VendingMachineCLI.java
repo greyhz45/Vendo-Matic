@@ -7,6 +7,7 @@ import com.techelevator.menu_process.PurchaseItem;
 import com.techelevator.menu_process.RunningBalance;
 import com.techelevator.util.SalesReport;
 import com.techelevator.util.VendoLog;
+import com.techelevator.view.MakeChange;
 import com.techelevator.view.Menu;
 
 import java.math.BigDecimal;
@@ -16,6 +17,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class VendingMachineCLI {
+
+	private static final String[] MAIN = {"Main Menu"};
 
 	private static final String MAIN_MENU_OPTION_DISPLAY_ITEMS = "Display Vending Machine Items";
 	private static final String MAIN_MENU_OPTION_PURCHASE = "Purchase";
@@ -34,13 +37,15 @@ public class VendingMachineCLI {
 	private Menu purchaseMenu;
 
 	private RestockMachine restock;
-
-	public VendingMachineCLI(Menu menu, Menu purchaseMenu) {
+	private MakeChange change;
+	private BigDecimal balance = new BigDecimal("0.00");
+	public VendingMachineCLI(Menu menu, Menu purchaseMenu, MakeChange change) {
 
 		this.menu = menu;
 		this.purchaseMenu = purchaseMenu;
+		this.change = change;
 	}
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public void run() {
 
 		restock = new RestockMachine("vendingmachine.csv");
@@ -48,6 +53,7 @@ public class VendingMachineCLI {
 		PurchaseItem purchase = new PurchaseItem();
 		FeedMoney feedMoney = new FeedMoney();
 		Scanner userInput = new Scanner(System.in);
+
 
 		//for log date formatting
         LocalDate today = LocalDate.now();
@@ -58,6 +64,11 @@ public class VendingMachineCLI {
 		String oldBalStr;
 		String currBalStr;
 		boolean resetTran = false;
+
+
+
+		welcome();
+		// menu.getChoiceFromOptions(MAIN);
 
 		while (true) {
 			String choice = (String) menu.getChoiceFromOptions(MAIN_MENU_OPTIONS);
@@ -99,15 +110,28 @@ public class VendingMachineCLI {
 						purchase.updateInventoryAndBalance(inventory);
 					} else if (purchaseChoice.equals(PURCHASE_MENU_OPTION_FINISH_TRANSACTION)) {
 						//finish and display change
-						RunningBalance.giveChange();
+
+						List<Integer> listChange = change.makeChange(RunningBalance.getCurrBalance());
+						List<String> denominations = change.retrieveCurrencyDenominations();
+						System.out.println("\nPlease Take Your Change Below >>> \nChange: ");
+						for (int i = 0; i < listChange.size(); i++) {
+							System.out.print(listChange.get(i));
+							System.out.print(denominations.get(i) + "\n");
+						}
+
+						listChange.clear();
+
+
 						oldBalStr = currencyFormat.format(RunningBalance.getOldBalance());
 						currBalStr = currencyFormat.format(RunningBalance.getCurrBalance());
+
 						VendoLog.log("GIVE CHANGE", oldBalStr, currBalStr, formattedDate);
 						resetTran = true;
 						break;
 					}
 				}
 			} else if (choice.equals(MAIN_MENU_OPTION_EXIT)) {
+				System.out.println("\nThank You For Your Purchase!");
 				break;
 			} else if (choice.equals(MAIN_MENU_OPTION_SALES_REPORT)) {
 				SalesReport salesReport = new SalesReport("logs", formattedDate);
@@ -115,6 +139,8 @@ public class VendingMachineCLI {
 			}
 		}
 	}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public void displayItemsToConsole(Map<String, Product> displayItems) {
 
@@ -139,10 +165,22 @@ public class VendingMachineCLI {
 		}
 	}
 
+	public void welcome(){
+		System.out.println("*******************************");
+		System.out.println("Welcome to the Vendo-Matic 800");
+		System.out.println("*******************************");
+
+
+
+
+
+	}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static void main(String[] args) {
 		Menu menu = new Menu(System.in, System.out, " ");
 		Menu purchaseMenu = new Menu(System.in, System.out, "purchase");
-		VendingMachineCLI cli = new VendingMachineCLI(menu, purchaseMenu);
+		MakeChange change = new MakeChange();
+		VendingMachineCLI cli = new VendingMachineCLI(menu, purchaseMenu, change);
 		cli.run();
 	}
 }

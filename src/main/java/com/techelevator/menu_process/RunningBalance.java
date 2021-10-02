@@ -1,11 +1,17 @@
 package com.techelevator.menu_process;
 
+import com.techelevator.view.MakeChange;
+
 import java.math.BigDecimal;
+import java.util.List;
 
 public class RunningBalance {
+    private static MakeChange change;
 
-    private static BigDecimal currBalance = new BigDecimal(0.00);;
-    private static BigDecimal oldBalance = new BigDecimal(0.00);;
+    private static BigDecimal currBalance = new BigDecimal(0.00);
+    ;
+    private static BigDecimal oldBalance = new BigDecimal(0.00);
+    ;
 
     public RunningBalance() {
 
@@ -45,5 +51,7 @@ public class RunningBalance {
 
         setOldBalance(getCurrBalance());
         setCurrBalance(new BigDecimal(0.00));
+
+
     }
 }

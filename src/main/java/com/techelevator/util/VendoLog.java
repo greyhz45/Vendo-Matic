@@ -12,6 +12,7 @@ public class VendoLog {
 
     public static void log(String tranName, String oldBalance, String newBalance, String date) {
 
+
         String logPath = "logs/vendolog" + "_" + date + ".log";
         File logFile = new File(logPath);
         //formatter for audit log

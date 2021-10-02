@@ -54,11 +54,11 @@ public class Menu {
 			int optionNum = i + 1;
 			out.println(optionNum + ") " + options[i]);
 		}
-
 		if (this.menuType.equalsIgnoreCase("purchase"))
-			out.printf("\nCurrent Money Provided: $%5.2f \n", RunningBalance.getCurrBalance());
+				out.printf("\nCurrent Money Provided: $%5.2f \n", RunningBalance.getCurrBalance());
 
-		out.print(System.lineSeparator() + "Please choose an option >>> ");
-		out.flush();
+			out.print(System.lineSeparator() + "Please choose an option >>> ");
+			out.flush();
 	}
+
 }
