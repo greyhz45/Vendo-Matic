@@ -35,15 +35,17 @@ public class VendingMachineCLI {
 
 	private Menu menu;
 	private Menu purchaseMenu;
+	private Menu mainMenu;
 
 	private RestockMachine restock;
 	private MakeChange change;
 	private BigDecimal balance = new BigDecimal("0.00");
-	public VendingMachineCLI(Menu menu, Menu purchaseMenu, MakeChange change) {
+	public VendingMachineCLI(Menu menu, Menu purchaseMenu, MakeChange change, Menu mainMenu) {
 
 		this.menu = menu;
 		this.purchaseMenu = purchaseMenu;
 		this.change = change;
+		this.mainMenu = mainMenu;
 	}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public void run() {
@@ -65,10 +67,8 @@ public class VendingMachineCLI {
 		String currBalStr;
 		boolean resetTran = false;
 
-
-
 		welcome();
-		// menu.getChoiceFromOptions(MAIN);
+		mainMenu.getChoiceFromOptions(MAIN);
 
 		while (true) {
 			String choice = (String) menu.getChoiceFromOptions(MAIN_MENU_OPTIONS);
@@ -121,7 +121,7 @@ public class VendingMachineCLI {
 
 						listChange.clear();
 
-
+						RunningBalance.giveChange();
 						oldBalStr = currencyFormat.format(RunningBalance.getOldBalance());
 						currBalStr = currencyFormat.format(RunningBalance.getCurrBalance());
 
@@ -180,7 +180,8 @@ public class VendingMachineCLI {
 		Menu menu = new Menu(System.in, System.out, " ");
 		Menu purchaseMenu = new Menu(System.in, System.out, "purchase");
 		MakeChange change = new MakeChange();
-		VendingMachineCLI cli = new VendingMachineCLI(menu, purchaseMenu, change);
+		Menu mainMenu = new Menu(System.in, System.out, "mainMenu");
+		VendingMachineCLI cli = new VendingMachineCLI(menu, purchaseMenu, change, mainMenu);
 		cli.run();
 	}
 }
