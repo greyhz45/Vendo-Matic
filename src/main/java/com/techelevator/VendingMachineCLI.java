@@ -5,6 +5,7 @@ import com.techelevator.inventory.RestockMachine;
 import com.techelevator.menu_process.FeedMoney;
 import com.techelevator.menu_process.PurchaseItem;
 import com.techelevator.menu_process.RunningBalance;
+import com.techelevator.util.SalesReport;
 import com.techelevator.util.VendoLog;
 import com.techelevator.view.Menu;
 
@@ -19,7 +20,8 @@ public class VendingMachineCLI {
 	private static final String MAIN_MENU_OPTION_DISPLAY_ITEMS = "Display Vending Machine Items";
 	private static final String MAIN_MENU_OPTION_PURCHASE = "Purchase";
 	private static final String MAIN_MENU_OPTION_EXIT = "Exit";
-	private static final String[] MAIN_MENU_OPTIONS = { MAIN_MENU_OPTION_DISPLAY_ITEMS, MAIN_MENU_OPTION_PURCHASE, MAIN_MENU_OPTION_EXIT };
+	private static final String MAIN_MENU_OPTION_SALES_REPORT = " ";
+	private static final String[] MAIN_MENU_OPTIONS = { MAIN_MENU_OPTION_DISPLAY_ITEMS, MAIN_MENU_OPTION_PURCHASE, MAIN_MENU_OPTION_EXIT, MAIN_MENU_OPTION_SALES_REPORT };
 
 	private static final String PURCHASE_MENU_OPTION_FEED_MONEY = "Feed Money";
 	private static final String PURCHASE_MENU_OPTION_SELECT_PRODUCT = "Select Product";
@@ -107,6 +109,9 @@ public class VendingMachineCLI {
 				}
 			} else if (choice.equals(MAIN_MENU_OPTION_EXIT)) {
 				break;
+			} else if (choice.equals(MAIN_MENU_OPTION_SALES_REPORT)) {
+				SalesReport salesReport = new SalesReport("logs", formattedDate);
+				salesReport.generateSalesReport(inventory);
 			}
 		}
 	}
