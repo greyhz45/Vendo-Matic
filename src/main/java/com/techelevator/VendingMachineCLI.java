@@ -16,6 +16,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static java.lang.System.exit;
+import static java.lang.System.setOut;
+
 public class VendingMachineCLI {
 
 	private static final String[] MAIN = {"Main Menu"};
@@ -40,6 +43,20 @@ public class VendingMachineCLI {
 	private RestockMachine restock;
 	private MakeChange change;
 	private BigDecimal balance = new BigDecimal("0.00");
+
+	private PurchaseItem purchase = new PurchaseItem();
+	private FeedMoney feedMoney = new FeedMoney();
+
+	//for log date formatting
+	private LocalDate today = LocalDate.now();
+	private String formattedDate = today.format(DateTimeFormatter.ofPattern("MMddyyyy"));
+
+	//for currency formatting
+	private NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
+	private String oldBalStr;
+	private String currBalStr;
+	boolean resetTran = false;
+
 	public VendingMachineCLI(Menu menu, Menu purchaseMenu, MakeChange change, Menu mainMenu) {
 
 		this.menu = menu;
@@ -47,25 +64,14 @@ public class VendingMachineCLI {
 		this.change = change;
 		this.mainMenu = mainMenu;
 	}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	public void run() {
 
-		restock = new RestockMachine("vendingmachine.csv");
-		Map<String, Product> inventory = restock.buildStock();
-		PurchaseItem purchase = new PurchaseItem();
-		FeedMoney feedMoney = new FeedMoney();
 		Scanner userInput = new Scanner(System.in);
 
-
-		//for log date formatting
-        LocalDate today = LocalDate.now();
-        String formattedDate = today.format(DateTimeFormatter.ofPattern("MMddyyyy"));
-
-		//for currency formatting
-		NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
-		String oldBalStr;
-		String currBalStr;
-		boolean resetTran = false;
+		//restock vending machine
+		restockVendo();
+		Map<String, Product> inventory = restock.buildStock();
 
 		welcome();
 		mainMenu.getChoiceFromOptions(MAIN);
@@ -83,25 +89,7 @@ public class VendingMachineCLI {
 
 					if (purchaseChoice.equals(PURCHASE_MENU_OPTION_FEED_MONEY)) {
 						//do feed money
-						int amtEntered = 0;
-						while (true) {
-							try {
-								System.out.print("Enter amount: ");
-								if (feedMoney.isValidMoney(userInput.nextBigDecimal())) {
-									oldBalStr = currencyFormat.format(RunningBalance.getOldBalance());
-									currBalStr = currencyFormat.format(RunningBalance.getCurrBalance());
-									if (!resetTran) {
-										VendoLog.log("FEED MONEY", currBalStr, currBalStr, formattedDate);
-										resetTran = false;
-									} else {
-										VendoLog.log("FEED MONEY", oldBalStr, currBalStr, formattedDate);
-									}
-								}
-								break;
-							} catch (NumberFormatException e) {
-								System.out.println("\n*** Please enter a valid amount.");
-							}
-						}
+						callFeedMoney();
 					} else if (purchaseChoice.equals(PURCHASE_MENU_OPTION_SELECT_PRODUCT)) {
 						//do purchase
 						displayItemsToConsole(inventory);
@@ -110,22 +98,8 @@ public class VendingMachineCLI {
 						purchase.updateInventoryAndBalance(inventory);
 					} else if (purchaseChoice.equals(PURCHASE_MENU_OPTION_FINISH_TRANSACTION)) {
 						//finish and display change
-
-						List<Integer> listChange = change.makeChange(RunningBalance.getCurrBalance());
-						List<String> denominations = change.retrieveCurrencyDenominations();
-						System.out.println("\nPlease Take Your Change Below >>> \nChange: ");
-						for (int i = 0; i < listChange.size(); i++) {
-							System.out.print(listChange.get(i));
-							System.out.print(denominations.get(i) + "\n");
-						}
-
-						listChange.clear();
-
-						RunningBalance.giveChange();
-						oldBalStr = currencyFormat.format(RunningBalance.getOldBalance());
-						currBalStr = currencyFormat.format(RunningBalance.getCurrBalance());
-
-						VendoLog.log("GIVE CHANGE", oldBalStr, currBalStr, formattedDate);
+						processChange();
+						finalizeTran();
 						resetTran = true;
 						break;
 					}
@@ -140,12 +114,13 @@ public class VendingMachineCLI {
 		}
 	}
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	public void displayItemsToConsole(Map<String, Product> displayItems) {
 
 		System.out.println();
 
+		//print header
+		System.out.printf("%-6s %-20s %-30s %n", "CODE", "DESCRIPTION", "PRICE");
+		System.out.println("=================================");
 		//sort map by keys
 		TreeMap<String, Product> sortedMap = new TreeMap<>(displayItems);
 		Iterator itr = sortedMap.keySet().iterator();
@@ -154,8 +129,7 @@ public class VendingMachineCLI {
 			String key = (String) itr.next();
 			Product inventory = displayItems.get(key);
 
-			System.out.print(key + " ");
-			System.out.print(inventory.getName() + " ");
+			System.out.printf("%-6s %-21s", key, inventory.getName());
 			if (inventory.getQuantity() == 0) {
 				System.out.print("$" + inventory.getPrice());
 				System.out.println("\t***SOLD OUT");
@@ -163,17 +137,67 @@ public class VendingMachineCLI {
 				System.out.println("$" + inventory.getPrice());
 			}
 		}
+		//line below
+		System.out.println("=================================");
+	}
+
+	private void restockVendo() {
+
+		restock = new RestockMachine("vendingmachine.csv");
+		if (restock.getItems().isEmpty()) {
+			System.out.println("*** Sorry no items found.");
+			exit(1);
+		}
+	}
+
+	private void callFeedMoney() {
+
+		Scanner userInput = new Scanner(System.in);
+
+		try {
+			System.out.print("Enter amount: ");
+			if (feedMoney.isValidMoney(userInput.nextBigDecimal())) {
+				oldBalStr = currencyFormat.format(RunningBalance.getOldBalance());
+				currBalStr = currencyFormat.format(RunningBalance.getCurrBalance());
+				if (!resetTran) {
+					VendoLog.log("FEED MONEY", currBalStr, currBalStr, formattedDate);
+					resetTran = false;
+				} else {
+					VendoLog.log("FEED MONEY", oldBalStr, currBalStr, formattedDate);
+				}
+			}
+		} catch (InputMismatchException e) {
+			System.out.println("\n*** Please enter a valid amount.");
+		}
+	}
+
+	private void processChange() {
+
+		List<Integer> listChange = change.makeChange(RunningBalance.getCurrBalance());
+		List<String> denominations = change.retrieveCurrencyDenominations();
+		System.out.println("\nPlease Take Your Change Below >>> \nChange: ");
+		for (int i = 0; i < listChange.size(); i++) {
+			System.out.print(listChange.get(i));
+			System.out.print(denominations.get(i) + "\n");
+		}
+
+		listChange.clear();
+	}
+
+	private void finalizeTran() {
+
+		RunningBalance.giveChange();
+		oldBalStr = currencyFormat.format(RunningBalance.getOldBalance());
+		currBalStr = currencyFormat.format(RunningBalance.getCurrBalance());
+
+		VendoLog.log("GIVE CHANGE", oldBalStr, currBalStr, formattedDate);
 	}
 
 	public void welcome(){
+
 		System.out.println("*******************************");
 		System.out.println("Welcome to the Vendo-Matic 800");
 		System.out.println("*******************************");
-
-
-
-
-
 	}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static void main(String[] args) {

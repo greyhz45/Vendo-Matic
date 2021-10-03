@@ -25,6 +25,8 @@ public class RestockMachine {
         List<InputDetails> items = new ArrayList<>();
         File dataFile = new File(this.file);
 
+        boolean cont = false;
+
         try (Scanner dataInput = new Scanner(dataFile)) {
             while (dataInput.hasNextLine()) {
                 String[] inputArray = dataInput.nextLine().split("\\|");
@@ -32,7 +34,11 @@ public class RestockMachine {
                 items.add(inputDetails);
             }
         } catch (FileNotFoundException e) {
-            throw new RestockMachineException(e.getMessage());
+            System.out.println("Input file not found.\n" +
+                    "Make sure it is in it's proper folder.\n" +
+                    "Please call Vendo-Matic. " +
+                    dataFile.getAbsolutePath() +
+                    "\n");
         }
 
         return items;
@@ -45,7 +51,6 @@ public class RestockMachine {
         List<InputDetails> inputDetails = this.getItems();
 
         for (InputDetails input: inputDetails) {
-
             switch (input.getCategory().toUpperCase()) {
                 case "CHIP": {
                     Product chip = new Chip(input.getSlotIdentifier(), input.getName(), input.getPrice(), MAX_QUANTITY);

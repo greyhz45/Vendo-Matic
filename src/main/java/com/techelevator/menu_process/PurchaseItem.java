@@ -31,9 +31,19 @@ public class PurchaseItem {
     public boolean checkAvailability(Map<String, Product> items) {
 
         String keyCode = this.codeBought.toUpperCase();
-        if (items.containsKey(keyCode) && items.get(keyCode).getQuantity() > 0) {
-            return true;
+        if (items.containsKey(keyCode)) {
+            if (items.get(keyCode).getQuantity() > 0) {
+                return true;
+            } else {
+                System.out.println("*** Item code " + "\"" +
+                        this.codeBought.toUpperCase() + "\"" +
+                        " already SOLD OUT.");
+                return false;
+            }
         } else {
+            System.out.println("*** Item code " + "\"" +
+                    this.codeBought + "\"" +
+                    " invalid. Pls. enter valid code.");
             return false;
         }
     }
@@ -47,6 +57,8 @@ public class PurchaseItem {
                 return true;
             }
         }
+
+        System.out.println("*** Not enough balance. Pls. provide money.");
         return false;
     }
 

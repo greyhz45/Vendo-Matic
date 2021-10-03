@@ -54,9 +54,7 @@ public class SalesReport {
         BigDecimal increment = new BigDecimal(1.00);
 
         if (!filePath.isEmpty()) {
-
             File dataFile = new File(this.folder, filePath);
-
             if (dataFile.exists() && dataFile.isFile()) {
                 try (Scanner fileScanner = new Scanner(dataFile)) {
                     while (fileScanner.hasNextLine()) {
@@ -73,7 +71,7 @@ public class SalesReport {
                         }
                     }
                 } catch (FileNotFoundException e) {
-                    throw new SalesReportException(e.getMessage());
+                    System.out.println("File not found exception: " + dataFile.getAbsolutePath());
                 }
             }
         }
@@ -100,34 +98,43 @@ public class SalesReport {
         if (!summary.isEmpty()) {
             File salesFile = new File(salesPath);
             PrintWriter lineOut = null;
-
-            if (!salesFile.exists()) {
-                try {
-                    salesFile.createNewFile();
-                } catch (IOException e) {
-                    throw new SalesReportException(e.getMessage());
-                }
-            }
-
+            boolean skip = false;
             try {
+                if (!salesFile.exists()) {
+                    salesFile.createNewFile();
+                }
                 lineOut = new PrintWriter(salesFile);
-                for (Map.Entry<String, Product> item : inventory.entrySet()) {
-                    if (summary.containsKey(item.getKey())) {
-                        lineOut.println(item.getValue().getName() + PIPE + summary.get(item.getKey()));
-                        BigDecimal bigValue = summary.get(item.getKey());
-                        bigValue = bigValue.multiply(item.getValue().getPrice());;
+                //sort map by keys
+                TreeMap<String, Product> sortedMap = new TreeMap<>(inventory);
+                Iterator itr = sortedMap.keySet().iterator();
+
+                while (itr.hasNext()) {
+                    String key = (String) itr.next();
+                    Product item = inventory.get(key);
+
+                    if (summary.containsKey(item.getSlot())) {
+                        lineOut.println(item.getSlot() +
+                                PIPE + item.getName() +
+                                PIPE + summary.get(item.getSlot()));
+                        BigDecimal bigValue = summary.get(item.getSlot());
+                        bigValue = bigValue.multiply(item.getPrice());;
                         totalSales = totalSales.add(bigValue);
                     } else {
-                        lineOut.println(item.getValue().getName() + PIPE + 0);
+                        lineOut.println(item.getSlot() +
+                                PIPE + item.getName() +
+                                PIPE + 0);
                     }
                 }
             } catch (IOException e) {
-                throw new SalesReportException(e.getMessage());
+                System.out.println("Input/Output Exception error: " + salesFile.getAbsolutePath());
+                skip = true;
             } finally {
-                formattedSales = currencyFormat.format(totalSales);
-                lineOut.println("**TOTAL SALES** " + formattedSales);
-                lineOut.close();
-                System.out.println("*** " + salesPath + " generated.");
+                if (!skip) {
+                    formattedSales = currencyFormat.format(totalSales);
+                    lineOut.println("**TOTAL SALES** " + formattedSales);
+                    lineOut.close();
+                    System.out.println("*** " + salesPath + " generated.");
+                }
             }
         }
     }
