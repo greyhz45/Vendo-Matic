@@ -166,6 +166,8 @@ public class VendingMachineCLI {
 				} else {
 					VendoLog.log("FEED MONEY", oldBalStr, currBalStr, logPath);
 				}
+			} else {
+				System.out.println("\n*** Please enter a valid amount.");
 			}
 		} catch (InputMismatchException e) {
 			System.out.println("\n*** Please enter a valid amount.");

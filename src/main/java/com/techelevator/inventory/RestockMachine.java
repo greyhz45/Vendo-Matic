@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 public class RestockMachine {
+
     private List<InputDetails> items;
     private String file;
 
@@ -21,6 +22,9 @@ public class RestockMachine {
     }
 
     private List<InputDetails> readInput() {
+
+        //make sure directory exists for logs
+        makeDir_Log();
 
         List<InputDetails> items = new ArrayList<>();
         File dataFile = new File(this.file);
@@ -75,5 +79,16 @@ public class RestockMachine {
         }
 
         return displayItems;
+    }
+
+    private static void makeDir_Log() {
+
+        //make sure logs/ folder exists
+        String logFolder = "logs";
+        File logs = new File(logFolder);
+
+        if (!logs.exists()) {
+            logs.mkdir();
+        }
     }
 }
