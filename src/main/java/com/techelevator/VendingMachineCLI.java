@@ -142,7 +142,7 @@ public class VendingMachineCLI {
 		System.out.println("=================================");
 	}
 
-	private void restockVendo() {
+	public void restockVendo() {
 
 		restock = new RestockMachine("vendingmachine.csv");
 		if (restock.getItems().isEmpty()) {
