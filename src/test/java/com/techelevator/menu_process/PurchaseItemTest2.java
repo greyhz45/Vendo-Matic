@@ -11,10 +11,10 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-public class PurchaseItemTest {
+public class PurchaseItemTest2 {
 
     @Test
-    public void updateInventoryAndBalance_validCodeTest() {
+    public void updateInventoryAndBalance_invalidCodeTest() {
 
         RestockMachine restock = new RestockMachine("src/test/vendingmachinetest.csv");
         Map<String, Product> inventory = restock.buildStock();
@@ -24,18 +24,18 @@ public class PurchaseItemTest {
         boolean actual = feed.isValidMoney(new BigDecimal(5.00));
 
         PurchaseItem codeBought = new PurchaseItem();
-        codeBought.setCodeBought("A2");
+        codeBought.setCodeBought("Z2");
 
-        boolean success = codeBought.updateInventoryAndBalance(inventory);
+        boolean result = codeBought.updateInventoryAndBalance(inventory);
 
-        assertTrue("Item not updated.", success);
+        assertFalse("Result should be false.", result);
 
         //check if balance are correct
         MathContext mc = new MathContext(3);
         BigDecimal oldActual = RunningBalance.getOldBalance();
         BigDecimal currentActual = new BigDecimal(String.valueOf(RunningBalance.getCurrBalance()), mc);
 
-        assertEquals("Old Balance not correct.", new BigDecimal(5.00), oldActual);
-        assertEquals("Current Balance not correct.", new BigDecimal(3.55, mc), currentActual);
+        assertEquals("Old Balance not correct.", new BigDecimal(0.00), oldActual);
+        assertEquals("Current Balance not correct.", new BigDecimal(5.00, mc), currentActual);
     }
 }
