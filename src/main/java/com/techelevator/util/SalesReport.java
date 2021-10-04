@@ -24,7 +24,7 @@ public class SalesReport {
         this.date = date;
     }
 
-    private String findFile() {
+    public String findFile() {
 
         List<String> files = new ArrayList<>();
         File[] filePath = new File(this.folder).listFiles();
@@ -79,11 +79,11 @@ public class SalesReport {
         return salesSummary;
     }
 
-    public void generateSalesReport(Map<String, Product> inventory) {
+    public String generateSalesReport(Map<String, Product> inventory) {
 
         //date formatter for filename
         LocalDateTime time = LocalDateTime.now();
-        String timestamp = DateTimeFormatter.ofPattern("yyyyMMdd_hhmmss").format(time);
+        String timestamp = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").format(time);
         String salesPath = this.folder + "/SalesReport_" + timestamp + ".csv";
 
         //for currency formatting
@@ -137,5 +137,7 @@ public class SalesReport {
                 }
             }
         }
+
+        return salesPath;
     }
 }

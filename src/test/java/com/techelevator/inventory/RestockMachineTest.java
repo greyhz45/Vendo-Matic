@@ -17,4 +17,13 @@ public class RestockMachineTest {
         assertEquals("Extracted list is not the same.", 13, stockList.size());
     }
 
+    @Test
+    public void classRestockMachine_readInvalid_file() {
+
+        RestockMachine restock = new RestockMachine("src/test/vendingmachine.csv");
+        List<InputDetails> stockList = restock.getItems();
+
+        assertEquals("No data should be read.", 0, stockList.size());
+    }
+
 }

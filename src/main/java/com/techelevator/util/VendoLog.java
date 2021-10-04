@@ -10,9 +10,8 @@ public class VendoLog {
 
     static PrintWriter logOutput = null;
 
-    public static void log(String tranName, String oldBalance, String newBalance, String date) {
+    public static void log(String tranName, String oldBalance, String newBalance, String logPath) {
 
-        String logPath = "logs/vendolog" + "_" + date + ".log";
         File logFile = new File(logPath);
         //formatter for audit log
         LocalDateTime time = LocalDateTime.now();
@@ -49,13 +48,7 @@ public class VendoLog {
                         logFile.getAbsolutePath());
                 skip = true;
             } finally {
-                if (!skip) {
-                    if (tranName.equals("GIVE CHANGE")) {
-                        logOutput.close();
-                    } else {
-                        logOutput.flush();
-                    }
-                }
+                logOutput.flush();
             }
         }
     }

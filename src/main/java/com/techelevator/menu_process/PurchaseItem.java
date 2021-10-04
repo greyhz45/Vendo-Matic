@@ -70,6 +70,7 @@ public class PurchaseItem {
         //for log date formatting
         LocalDate today = LocalDate.now();
         String formattedDate = today.format(DateTimeFormatter.ofPattern("MMddyyyy"));
+        String logPath = "logs/vendolog" + "_" + formattedDate + ".log";
 
         String oldBalStr;
         String currBalStr;
@@ -88,7 +89,7 @@ public class PurchaseItem {
                 System.out.println("*** " + items.get(keycode).getSound());
             }
             String forLog = items.get(keycode).getName() + " " + items.get(keycode).getSlot();
-            VendoLog.log(forLog, oldBalStr, currBalStr, formattedDate);
+            VendoLog.log(forLog, oldBalStr, currBalStr, logPath);
             return true;
         } else {
             return false;

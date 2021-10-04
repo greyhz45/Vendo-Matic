@@ -50,6 +50,7 @@ public class VendingMachineCLI {
 	//for log date formatting
 	private LocalDate today = LocalDate.now();
 	private String formattedDate = today.format(DateTimeFormatter.ofPattern("MMddyyyy"));
+	private String logPath = "logs/vendolog" + "_" + formattedDate + ".log";
 
 	//for currency formatting
 	private NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
@@ -100,7 +101,7 @@ public class VendingMachineCLI {
 						//finish and display change
 						processChange();
 						finalizeTran();
-						resetTran = true;
+						resetTran = false;
 						break;
 					}
 				}
@@ -109,7 +110,7 @@ public class VendingMachineCLI {
 				break;
 			} else if (choice.equals(MAIN_MENU_OPTION_SALES_REPORT)) {
 				SalesReport salesReport = new SalesReport("logs", formattedDate);
-				salesReport.generateSalesReport(inventory);
+				String salesFilename = salesReport.generateSalesReport(inventory);
 			}
 		}
 	}
@@ -160,10 +161,10 @@ public class VendingMachineCLI {
 				oldBalStr = currencyFormat.format(RunningBalance.getOldBalance());
 				currBalStr = currencyFormat.format(RunningBalance.getCurrBalance());
 				if (!resetTran) {
-					VendoLog.log("FEED MONEY", currBalStr, currBalStr, formattedDate);
-					resetTran = false;
+					VendoLog.log("FEED MONEY", currBalStr, currBalStr, logPath);
+					resetTran = true;
 				} else {
-					VendoLog.log("FEED MONEY", oldBalStr, currBalStr, formattedDate);
+					VendoLog.log("FEED MONEY", oldBalStr, currBalStr, logPath);
 				}
 			}
 		} catch (InputMismatchException e) {
@@ -190,7 +191,7 @@ public class VendingMachineCLI {
 		oldBalStr = currencyFormat.format(RunningBalance.getOldBalance());
 		currBalStr = currencyFormat.format(RunningBalance.getCurrBalance());
 
-		VendoLog.log("GIVE CHANGE", oldBalStr, currBalStr, formattedDate);
+		VendoLog.log("GIVE CHANGE", oldBalStr, currBalStr, logPath);
 	}
 
 	public void welcome(){
